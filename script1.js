@@ -1,10 +1,13 @@
-function f1() {
-  throw new Error('error from script1.js');
+self.addEventListener('error', (e) => {
+  console.log('caught in script1.js', e);
+});
+function ff1() {
+  throw new Error('throw from script1.js');
 }
-function f2() {
-  return f1() + 1;
+function ff2() {
+  return ff1() + 1;
 }
-function f3() {
-  return f2() + 1;
+function ff3() {
+  return ff2() + 1;
 }
-setTimeout(() => f3(), 3000);
+setTimeout(() => ff3(), 4000);
