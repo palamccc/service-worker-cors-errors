@@ -1,21 +1,22 @@
+function log(msg) {
+  console.log(`%c[${self.location.search}] ${msg}`, 'background-color:#ffffcc;color:black');
+}
 
-self.addEventListener('error', (e) => {
-  console.log('caught in worker.js', e);
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+self.addEventListener('install', (e) => {
+  log('⚡install');
+  e.waitUntil(sleep(3000));
+  sleep(6000).then(() => self.skipWaiting());
 });
 
-function f1() {
-  throw new Error('throw from worker.js');
-}
-function f2() {
-  return f1() + 1;
-}
-function f3() {
-  return f2() + 1;
-}
-setTimeout(() => f3(), 3000);
+self.addEventListener('activate', (e) => {
+  log('⚡activate');
+  e.waitUntil(clients.claim());
+});
 
-// note that  service worker is loaded from localhost
-// importscripts is loading from 127.0.0.1
-// they are from different domains
-// importScripts('/script1.js');
-importScripts('http://127.0.0.1:3000/script1.js');
+self.addEventListener('message', (e) => {
+  log(`⚡message.received ${e.data}`);
+});

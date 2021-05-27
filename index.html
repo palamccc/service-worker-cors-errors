@@ -1,4 +1,27 @@
 <h1>Index file</h1>
 <script>
-  navigator.serviceWorker.register('/worker.js?t=' + Date.now());
+  let swVersion = parseInt(localStorage.getItem('swcounter') || '0');
+  swVersion += 1;
+  localStorage.setItem('swcounter', swVersion);
+  let swReg = null;
+  navigator.serviceWorker.register(`/worker.js?swVersion=${swVersion}`)
+    .then(reg => { swReg = reg; });
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    console.info(`controller.changed = ${swReg?.active?.scriptURL}`);
+  });
+
+  let msgCounter = 0;
+  setInterval(() => {
+    msgCounter += 1;
+    const msg = `${swVersion}.${msgCounter}`;
+    console.group('from.page');
+    console.info(`sw.ctr = ${navigator.serviceWorker.controller?.scriptURL}`);
+    console.info(`active.sw = ${swReg?.active?.scriptURL}`);
+    if (swReg?.active) {
+      console.info(`page.sending ${msg}`);
+      swReg.active.postMessage(msg);
+    }
+    console.groupEnd();
+  }, 1000);
 </script>
